@@ -1,6 +1,9 @@
 import express from 'express';
 import morgan from 'morgan';
 
+import HttpError from './utils/httpError.js';
+import globalErrorHandlerMiddleware from './middlewares/errorHandlers.js';
+
 const app = express();
 
 app.use(express.json());
@@ -16,10 +19,9 @@ app.get('/home', (req, res, next) => {
 });
 
 app.all('*', (req, res, next) => {
-  res.status(404).json({
-    status: 'fail',
-    message: `The endpoint you requested (${req.originalUrl}) could not be found.`,
-  });
+  next(new HttpError(`The endpoint you requested (${req.originalUrl}) could not be found.`, 404));
 });
+
+app.use(globalErrorHandlerMiddleware);
 
 export default app;
