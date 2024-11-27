@@ -59,6 +59,7 @@ const userSchema = new mongoose.Schema(
   },
 );
 
+// pre middleware to hash password before saving or updating
 userSchema.pre('save', async function (next) {
   // make sure role is anything but admin
   if (this.role === 'admin') {
@@ -72,6 +73,11 @@ userSchema.pre('save', async function (next) {
 
   next();
 });
+
+// instance method to compare plain password with hashed password
+userSchema.methods.isCorrectPassword = async function (plainPassword) {
+  return await bcrypt.compare(plainPassword, this.password);
+};
 
 const User = mongoose.model('User', userSchema);
 
