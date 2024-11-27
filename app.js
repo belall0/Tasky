@@ -1,8 +1,8 @@
 import express from 'express';
 import morgan from 'morgan';
-
 import HttpError from './utils/httpError.js';
-import globalErrorHandlerMiddleware from './middlewares/errorHandlers.js';
+import globalErrorHandlerMiddleware from './middlewares/errorHandler.js';
+import userRoutes from './routes/userRoutes.js';
 
 const app = express();
 
@@ -17,6 +17,8 @@ app.get('/home', (req, res, next) => {
     message: 'Welcome to our API',
   });
 });
+
+app.use('/api/users', userRoutes);
 
 app.all('*', (req, res, next) => {
   next(new HttpError(`The endpoint you requested (${req.originalUrl}) could not be found.`, 404));

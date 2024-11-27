@@ -1,3 +1,4 @@
+import * as mongooseErrorHandler from './mongooseErrorHandlers.js';
 const ENV = process.env.NODE_ENV || 'production';
 
 const sendErrorDev = (err, res) => {
@@ -31,6 +32,11 @@ const globalErrorHandlerMiddleware = (err, req, res, next) => {
   if (ENV === 'development') {
     sendErrorDev(err, res);
   } else if (ENV === 'production') {
+    // handle mongoose errors
+    if (err.name === 'ValidationError') err = mongooseErrorHandler.handleDbValidationError(err);
+    if (err.name === 'CastError') err = mongooseErrorHandler.handleDbCastError(err);
+    if (err.code === 11000) err = mongooseErrorHandler.handleDbDuplicateFields(err);
+
     sendErrorProd(err, res);
   }
 };
